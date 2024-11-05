@@ -13,10 +13,10 @@ export default function Gallery() {
 
   return (
     <TooltipProvider>
-      <div ref={galleryRef} className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 text-white p-8">
-        <h1 className="text-4xl font-bold mb-12 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
+      <div ref={galleryRef} className="min-h-screen bg-gradient-to-br from-neutral-800 to-neutral-900 text-white p-8 pl-24 overflow-y-auto overflow-x-hidden">
+        {/* <h1 className="text-4xl font-bold mb-12 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
           자의누리 갤러리
-        </h1>
+        </h1> */}
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {works.map((work) => (
