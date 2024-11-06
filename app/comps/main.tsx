@@ -1,8 +1,6 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, X } from 'lucide-react'
-import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import Link from 'next/link'
@@ -13,7 +11,7 @@ export default function Gallery() {
 
   return (
     <TooltipProvider>
-      <div ref={galleryRef} className="min-h-screen bg-gradient-to-br from-neutral-800 to-neutral-900 text-white p-8 pl-24 overflow-y-auto overflow-x-hidden">
+      <div ref={galleryRef} className="min-h-screen bg-gradient-to-br from-neutral-800 to-neutral-900 text-white p-8 overflow-y-auto overflow-x-hidden">
         {/* <h1 className="text-4xl font-bold mb-12 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
           자의누리 갤러리
         </h1> */}
