@@ -3,8 +3,8 @@ import Gallery from "./comps/main";
 import Navbar from "./comps/navbar";
 
 export default function Home() {
-  return (<>
-    <Gallery />
+  return (<main className="flex flex-col">
     <Navbar />
-  </>);
+    <Gallery />
+  </main>);
 }

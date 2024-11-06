@@ -9,7 +9,7 @@ export default function Navbar(props:{}){
         initial={{x: -100}}
         animate={{x: 0}}
         transition={{duration: 0.5}}
-        className="h-full p-2 absolute left-0 top-0 bg-neutral-700"
+        className="h-full p-2 bg-neutral-700"
     >
         <Button><Home className="w-8 h-8" /></Button>
     </motion.nav>
