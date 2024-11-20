@@ -2,15 +2,50 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
+const suitThin = localFont({
+  src: "./fonts/SUIT-ttf/SUIT-Thin.ttf",
+  variable: "--font-suit-thin",
+  weight: "100",
 });
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+const suitExtraLight = localFont({
+  src: "./fonts/SUIT-ttf/SUIT-ExtraLight.ttf",
+  variable: "--font-suit-extra-light",
+  weight: "200",
+});
+const suitLight = localFont({
+  src: "./fonts/SUIT-ttf/SUIT-Light.ttf",
+  variable: "--font-suit-light",
+  weight: "300",
+});
+const suitRegular = localFont({
+  src: "./fonts/SUIT-ttf/SUIT-Regular.ttf",
+  variable: "--font-suit",
+  weight: "400",
+});
+const suitMedium = localFont({
+  src: "./fonts/SUIT-ttf/SUIT-Medium.ttf",
+  variable: "--font-suit-medium",
+  weight: "500",
+});
+const suitSemiBold = localFont({
+  src: "./fonts/SUIT-ttf/SUIT-SemiBold.ttf",
+  variable: "--font-suit-semi-bold",
+  weight: "600",
+});
+const suitBold = localFont({
+  src: "./fonts/SUIT-ttf/SUIT-Bold.ttf",
+  variable: "--font-suit-bold",
+  weight: "700",
+});
+const suitHeavy = localFont({
+  src: "./fonts/SUIT-ttf/SUIT-Heavy.ttf",
+  variable: "--font-suit-heavy",
+  weight: "800",
+});
+const suitExtraBold = localFont({
+  src: "./fonts/SUIT-ttf/SUIT-ExtraBold.ttf",
+  variable: "--font-suit-extra-bold",
+  weight: "900",
 });
 
 export const metadata: Metadata = {
@@ -26,7 +61,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${suitRegular.variable} antialiased`}
       >
         {children}
       </body>
