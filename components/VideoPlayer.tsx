@@ -123,7 +123,7 @@ const Controller = () => {
     }
     const {isPlaying, isMuted, volume, togglePlay, time, duration, toggleMute, seek} = context;
 
-    return <div className="absolute top-0 left-0 w-full h-full p-2 gap-2 flex flex-col justify-end items-center" onPointerDown={e => {
+    return <div className="absolute top-0 left-0 w-full h-full p-2 gap-2 flex flex-col justify-end items-center tet-el" onPointerDown={e => {
         e.stopPropagation();
         if(e.target === e.currentTarget) togglePlay();
     }}>
