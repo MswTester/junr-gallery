@@ -18,7 +18,7 @@ export default async function VideoPage({ params }: { params: { id: string } }) 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4">{video.title}</h1>
-      <VideoPlayer videoUrl={video.videoUrl} />
+      <VideoPlayer src={video.videoUrl} />
       <p className="mt-4 text-muted-foreground">Artist: {video.artist}</p>
     </div>
   )
