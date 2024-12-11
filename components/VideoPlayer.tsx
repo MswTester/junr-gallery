@@ -131,6 +131,7 @@ const Controller = () => {
             const rect = e.currentTarget.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const percent = x / rect.width;
+            console.log(percent);
             seek(duration * percent);
         }} />
         <div className='text-white flex justify-between'>
