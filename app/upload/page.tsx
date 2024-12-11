@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
@@ -28,6 +29,8 @@ export default function Upload() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [artist, setArtist] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -55,39 +58,49 @@ export default function Upload() {
       alert("모든 필드를 채워주세요!");
       return;
     }
-
-    const controller = new AbortController();
-    setAbortController(controller);
-
+  
+    setIsUploading(true);
+  
     const videoId = Date.now().toString(); // 유니크 ID 생성
+  
+    // const formData = new FormData();
+    // formData.append("fileStream", file); // 파일만 FormData로 추가
+  
+    const query = new URLSearchParams({
+      title,
+      description,
+      artist,
+    });
+  
+    const xhr = new XMLHttpRequest();
+  
+    xhr.open("POST", `/api/video?id=${videoId}&${query.toString()}`, true);
+  
+    // 업로드 진행률 이벤트
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const progress = (event.loaded / event.total) * 100;
+        setUploadProgress(progress); // 진행률 업데이트
+      }
+    };
 
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("title", title);
-      formData.append("description", description);
-      formData.append("artist", artist);
-
-      const response = await fetch(`/api/video?id=${videoId}`, {
-        method: "POST",
-        body: formData,
-        signal: controller.signal,
-      });
-
-      if (response.ok) {
+    xhr.onload = () => {
+      if (xhr.status === 201) {
         alert("Video uploaded successfully!");
       } else {
-        const errorData = await response.json();
-        console.error("Upload failed:", errorData);
-        alert(`Upload failed: ${errorData.message}`);
+        alert(`Upload failed: ${xhr.responseText}`);
       }
-    } catch (err: any) {
-      if (err.name === "AbortError") {
-        console.log("Upload canceled.");
-      } else {
-        console.error("Upload failed:", err);
-      }
-    }
+      setIsUploading(false);
+      setUploadProgress(0);
+    };
+
+    xhr.onerror = () => {
+      alert("An error occurred during the upload.");
+      setIsUploading(false);
+      setUploadProgress(0);
+    };
+  
+    xhr.send(file); // FormData로 파일 전송
   };
 
   const handleCancel = () => {
@@ -97,32 +110,49 @@ export default function Upload() {
     }
   };
 
+  const calcFileSize = (size: number):string => {
+    if (size === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+    const i = Math.floor(Math.log(size) / Math.log(k));
+    return parseFloat((size / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+
+  const getProgressString = (progress: number, totalSize: number):string => {
+    const uploaded = (totalSize * progress) / 100;
+    return `${calcFileSize(uploaded)} / ${calcFileSize(totalSize)}`;
+  };
+
   return <main className="w-full h-full flex justify-center items-center">
     <Card className="min-w-[400px] w-min">
       <CardHeader>
-        <CardTitle>작업물 추가하기</CardTitle>
-        <CardDescription>제목, 설명, 작업자, 영상을 기입하세요.</CardDescription>
+        <CardTitle>{isUploading ? "영상 업로드가 진행 중입니다" : "작업물 추가하기"}</CardTitle>
+        <CardDescription>{isUploading ? getProgressString(uploadProgress, file?.size || 0) : "제목, 설명, 작업자, 영상을 기입하세요"}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col justify-center items-center gap-4 p-4">
-        <ContentOption>
-          <Label className="w-16 text-center" htmlFor="title">제목</Label>
-          <Input id="title" value={title} onChange={e => setTitle(e.target.value)} placeholder="제목을 입력해주세요" />
-        </ContentOption>
-        <ContentOption>
-          <Label className="w-16 text-center" htmlFor="description">설명</Label>
-          <Input id="description" value={description} onChange={e => setDescription(e.target.value)} placeholder="설명을 입력해주세요" />
-        </ContentOption>
-        <ContentOption>
-          <Label className="w-16 text-center" htmlFor="artist">작업자</Label>
-          <Input id="artist" value={artist} onChange={e => setArtist(e.target.value)} placeholder="작업자를 입력해주세요" />
-        </ContentOption>
-        <ContentOption>
-          <Label className="w-16 text-center" htmlFor="file">파일</Label>
-          <Input id="file" type="file" onChange={handleFileChange} accept="video/mp4" multiple={false} />
-        </ContentOption>
+        {isUploading ? <>
+          <Progress value={uploadProgress} max={100} className="w-full" />
+        </> : <>
+          <ContentOption>
+            <Label className="w-16 text-center" htmlFor="title">제목</Label>
+            <Input id="title" value={title} onChange={e => setTitle(e.target.value)} placeholder="제목을 입력해주세요" />
+          </ContentOption>
+          <ContentOption>
+            <Label className="w-16 text-center" htmlFor="description">설명</Label>
+            <Input id="description" value={description} onChange={e => setDescription(e.target.value)} placeholder="설명을 입력해주세요" />
+          </ContentOption>
+          <ContentOption>
+            <Label className="w-16 text-center" htmlFor="artist">작업자</Label>
+            <Input id="artist" value={artist} onChange={e => setArtist(e.target.value)} placeholder="작업자를 입력해주세요" />
+          </ContentOption>
+          <ContentOption>
+            <Label className="w-16 text-center" htmlFor="file">파일</Label>
+            <Input id="file" type="file" onChange={handleFileChange} accept="video/mp4" multiple={false} />
+          </ContentOption>
+        </>}
       </CardContent>
       <CardFooter className="flex justify-end">
-        <Button onClick={handleUpload}>업로드</Button>
+        {isUploading ? <Button variant="outline" onClick={handleCancel}>취소</Button> : <Button onClick={handleUpload}>업로드</Button>}
       </CardFooter>
     </Card>
   </main>
