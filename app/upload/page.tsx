@@ -50,6 +50,53 @@ export default function Upload() {
     }
   };
 
+  const handleUpload = async () => {
+    if (!file || !title || !description || !artist) {
+      alert("모든 필드를 채워주세요!");
+      return;
+    }
+
+    const controller = new AbortController();
+    setAbortController(controller);
+
+    const videoId = Date.now().toString(); // 유니크 ID 생성
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("artist", artist);
+
+      const response = await fetch(`/api/video?id=${videoId}`, {
+        method: "POST",
+        body: formData,
+        signal: controller.signal,
+      });
+
+      if (response.ok) {
+        alert("Video uploaded successfully!");
+      } else {
+        const errorData = await response.json();
+        console.error("Upload failed:", errorData);
+        alert(`Upload failed: ${errorData.message}`);
+      }
+    } catch (err: any) {
+      if (err.name === "AbortError") {
+        console.log("Upload canceled.");
+      } else {
+        console.error("Upload failed:", err);
+      }
+    }
+  };
+
+  const handleCancel = () => {
+    if (abortController) {
+      abortController.abort();
+      setAbortController(null);
+    }
+  };
+
   return <main className="w-full h-full flex justify-center items-center">
     <Card className="min-w-[400px] w-min">
       <CardHeader>
@@ -58,24 +105,24 @@ export default function Upload() {
       </CardHeader>
       <CardContent className="flex flex-col justify-center items-center gap-4 p-4">
         <ContentOption>
-          <Label className="w-16 text-right" htmlFor="title">제목</Label>
+          <Label className="w-16 text-center" htmlFor="title">제목</Label>
           <Input id="title" value={title} onChange={e => setTitle(e.target.value)} placeholder="제목을 입력해주세요" />
         </ContentOption>
         <ContentOption>
-          <Label className="w-16 text-right" htmlFor="description">설명</Label>
+          <Label className="w-16 text-center" htmlFor="description">설명</Label>
           <Input id="description" value={description} onChange={e => setDescription(e.target.value)} placeholder="설명을 입력해주세요" />
         </ContentOption>
         <ContentOption>
-          <Label className="w-16 text-right" htmlFor="artist">작업자</Label>
+          <Label className="w-16 text-center" htmlFor="artist">작업자</Label>
           <Input id="artist" value={artist} onChange={e => setArtist(e.target.value)} placeholder="작업자를 입력해주세요" />
         </ContentOption>
         <ContentOption>
-          <Label className="w-16 text-right" htmlFor="file">파일</Label>
+          <Label className="w-16 text-center" htmlFor="file">파일</Label>
           <Input id="file" type="file" onChange={handleFileChange} accept="video/mp4" multiple={false} />
         </ContentOption>
       </CardContent>
-      <CardFooter>
-        <Button>업로드</Button>
+      <CardFooter className="flex justify-end">
+        <Button onClick={handleUpload}>업로드</Button>
       </CardFooter>
     </Card>
   </main>
