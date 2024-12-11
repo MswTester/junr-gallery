@@ -121,13 +121,18 @@ const Controller = () => {
     if (!context) {
         return null; // or handle the null case appropriately
     }
-    const {isPlaying, isMuted, volume, togglePlay, time, duration, toggleMute} = context;
+    const {isPlaying, isMuted, volume, togglePlay, time, duration, toggleMute, seek} = context;
 
     return <div className="absolute top-0 left-0 w-full h-full p-2 gap-2 flex flex-col justify-end items-center" onPointerDown={e => {
         e.stopPropagation();
         if(e.target === e.currentTarget) togglePlay();
     }}>
-        <Progress value={time/duration*100} max={100} className="w-full cursor-pointer" />
+        <Progress value={time/duration*100} max={100} className="w-full cursor-pointer" onClick={e => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const percent = x / rect.width;
+            seek(duration * percent);
+        }} />
         <div className='text-white flex justify-between'>
             <div className='flex gap-2'>
                 {isPlaying ? <Pause className='cursor-pointer' size={24} fill='#fff' onClick={togglePlay} />
