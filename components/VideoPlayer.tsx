@@ -1,18 +1,23 @@
 'use client'
 
-import { HTMLAttributes, useRef, useState } from 'react';
+import { HTMLAttributes, useEffect, useRef, useState } from 'react';
 
 interface VideoPlayerProps extends HTMLAttributes<HTMLDivElement> {
     src: string;
+    width?: number;
+    height?: number;
 }
 
-const VideoPlayer = ({src, className}:VideoPlayerProps) => {
+const VideoPlayer = ({src, className, width, height}:VideoPlayerProps) => {
+    const [once, setOnce] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(true);
     const [speedRate, setSpeedRate] = useState(1);
     const [volume, setVolume] = useState(1);
     const [isMuted, setIsMuted] = useState(false);
     const [time, setTime] = useState(0);
+
+    useEffect(() => setOnce(true), []);
 
     const play = () => {
         if(videoRef.current) {
@@ -70,8 +75,9 @@ const VideoPlayer = ({src, className}:VideoPlayerProps) => {
         }
     }
 
-    return <div className={"relative flex flex-col items-center rounded-md " + className} >
-        <video src={src} className='absolute top-0 left-0 -z-10' autoPlay={true} muted={isMuted} onTimeUpdate={onTimeUpdate}></video>
+    return once && <div className={"relative flex flex-col items-center rounded-md bg-[#000] -z-20 " + className} style={{width: `${width || 1200}px`, height: `${height || 900}px`}} onClick={togglePlay}>
+        <video src={src} className='absolute top-0 left-0 -z-10 w-full h-full' autoPlay={true} muted={isMuted} onTimeUpdate={onTimeUpdate} />
+        <div></div>
     </div>
 }
 

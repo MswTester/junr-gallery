@@ -1,9 +1,8 @@
 
-interface Artwork {
-    id: number;
+interface VideoData {
+    id: string;
     title: string;
     artist: string;
     description: string;
-    videoUrl: string;
-    thumbnailUrl: string;
+    url: string;
 }
