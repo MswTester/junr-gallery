@@ -1,6 +1,8 @@
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command";
+import { Separator } from "@/components/ui/separator";
 import VideoPlayer from "@/components/VideoPlayer";
 import { ChevronLeft, ChevronRight, User, Users, Users2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const ScreenContainer = styled.div`
@@ -14,6 +16,15 @@ const ScreenContainer = styled.div`
     align-items: center;
 
     overflow: hidden;
+`;
+const Overlay = styled.div<{ $isSearching: boolean }>`
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background-color: ${({ $isSearching }) => $isSearching ? 'rgba(0, 0, 0, 0.5)' : 'transparent'};
 `;
 
 const Row = styled.div<{ $width?: string, $height?: string }>`
@@ -49,22 +60,87 @@ const ImageView = styled.img<{ $src: string, $size: string }>`
     border-radius: 10px;
 `;
 
+const SearchContainer = styled.div`
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    min-width: 400px;
+    max-width: 600px;
+    z-index: 2;
+    background-color: white;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: 'hidden';
+`;
+
 const DesktopScreen = () => {
-    const videos: VideoDisplay[] = [
-        { title: "문선우의 똥", description: "똥의 심미성을 표현한 예술", artist: "문선우", videoUrl: "/videos/2.mp4", qrUrl: "https://avatars.githubusercontent.com/u/133082551?v=4" },
-        { title: "문선우의 자지", description: "섹스하고 싶다", artist: "이상준, 안진석", videoUrl: "/videos/2.mp4", qrUrl: "https://avatars.githubusercontent.com/u/125240533?v=4" },
-        { title: "문선우의 유두", description: "인생", artist: "섹스킹", videoUrl: "/videos/2.mp4", qrUrl: "https://avatars.githubusercontent.com/u/99114867?v=4" }
-    ]
+    const [videos, setVideos] = useState<VideoData[]>([
+        {
+            "id": "0",
+            "title": "",
+            "description": "",
+            "artist": "",
+            "url": ""
+        }
+    ]);
     const [playingIdx, setPlayingIdx] = useState(0);
+    const [isSearching, setIsSearching] = useState(false);
+
+    const handleKeyPress = (event: KeyboardEvent) => {
+        const ctrlPressed = event.ctrlKey;
+        const keyPressed = event.key === 'f';
+
+        if (ctrlPressed && keyPressed) {
+            event.preventDefault();
+            setIsSearching((prev) => !prev);
+        }
+    }
+
+    useEffect(() => {
+        window.addEventListener('keydown', handleKeyPress);
+        fetch('/api/get')
+        .then(res => res.json())
+        .then((data: VideoData[]) => {
+            console.log(data)
+            setVideos(data);
+        })
+        
+        return () => {
+            window.removeEventListener('keydown', handleKeyPress);
+        };
+    }, []);
 
     return (
         <ScreenContainer>
+            { isSearching && (
+                <>
+                    <Overlay $isSearching={isSearching} />
+                    <SearchContainer>
+                        <Command>
+                            <CommandInput placeholder="Type a command or search..." />
+                            <CommandList>
+                                <CommandEmpty>No results found.</CommandEmpty>
+                                {
+                                    videos.slice(0, 10).map((video, i) => {
+                                        return <CommandItem className="flex gap-2">
+                                            <div className="w-16 overflow-hidden text-nowrap text-ellipsis">{video.artist}</div>
+                                            <Separator orientation="vertical" className="h-4" />{video.title}
+                                        </CommandItem>
+                                    })
+                                }
+                            </CommandList>
+                        </Command>
+                    </SearchContainer>
+                </>
+            )}
             <ChevronLeft
                 size={36}
                 onClick={() => setPlayingIdx((prev) => (prev > 0 ? prev - 1 : videos.length - 1))}
             />
             <Column>
-                <VideoPlayer src={videos[playingIdx].videoUrl} width={700} height={360} />
+                <VideoPlayer src={videos[playingIdx].url} width={700} height={360} />
                 <Spacing $vertical="28px" />
                 <Row>
                     <Column $width="100%">
@@ -78,7 +154,7 @@ const DesktopScreen = () => {
                             <TextView $font="SUIT-Medium" $size="18px">{videos[playingIdx].artist}</TextView>
                         </Row>
                     </Column>
-                    <ImageView $src={videos[playingIdx].qrUrl} $size="120px" />
+                    <ImageView $src={videos[playingIdx].url} $size="120px" />
                 </Row>
             </Column>
             <ChevronRight

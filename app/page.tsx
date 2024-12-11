@@ -1,9 +1,10 @@
 'use client'
 
 import VideoPlayer from "@/components/VideoPlayer";
+import DesktopScreen from "@/screens/DesktopScreen";
 
 export default function Home() {
   return (<>
-    <VideoPlayer src="/videos/2.mp4" />
+    <DesktopScreen />
   </>);
 }
