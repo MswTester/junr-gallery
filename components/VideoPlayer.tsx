@@ -33,7 +33,7 @@ const VideoContext = createContext<VideoContextProps|null>(null);
 const VideoPlayer = ({src, className, width:w, height:h, borderRadius = 10, onEnd}:VideoPlayerProps) => {
     const [once, setOnce] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
-    const [isPlaying, setIsPlaying] = useState(true);
+    const [isPlaying, setIsPlaying] = useState(false);
     const [speedRate, setSpeedRate] = useState(1);
     const [volume, setVolume] = useState(.5);
     const [isMuted, setIsMuted] = useState(false);
@@ -101,11 +101,8 @@ const VideoPlayer = ({src, className, width:w, height:h, borderRadius = 10, onEn
         }
     }
 
-    return once && <div className={"relative flex flex-col items-center bg-[#000] " + className} style={{width: `${width}px`, height: `${height}px`, borderRadius: `${borderRadius}px`}} onPointerDown={e => {
-        e.stopPropagation();
-        togglePlay();
-    }}>
-        <video ref={videoRef} className='w-full h-full' autoPlay={true} muted={isMuted} onTimeUpdate={onTimeUpdate} onEnded={onEnd} onDurationChange={e => {
+    return once && <div className={"relative flex flex-col items-center bg-[#000] " + className} style={{width: `${width}px`, height: `${height}px`, borderRadius: `${borderRadius}px`}}>
+        <video ref={videoRef} className='w-full h-full' autoPlay={true} muted={isMuted} onTimeUpdate={onTimeUpdate} onEnded={onEnd} onLoadedMetadata={e => {
             if(videoRef.current) {
                 setDuration(videoRef.current.duration);
             }
@@ -124,14 +121,20 @@ const Controller = () => {
     if (!context) {
         return null; // or handle the null case appropriately
     }
-    const {isPlaying, isMuted, volume, togglePlay} = context;
+    const {isPlaying, isMuted, volume, togglePlay, time, duration, toggleMute} = context;
 
-    return <div className="absolute top-0 left-0 w-full h-full p-2 gap-2 flex flex-col justify-end items-center">
-        <Progress value={0} max={100} className="w-full" />
+    return <div className="absolute top-0 left-0 w-full h-full p-2 gap-2 flex flex-col justify-end items-center" onPointerDown={e => {
+        e.stopPropagation();
+        if(e.target === e.currentTarget) togglePlay();
+    }}>
+        <Progress value={time/duration*100} max={100} className="w-full cursor-pointer" />
         <div className='text-white flex justify-between'>
             <div className='flex gap-2'>
-                {isPlaying ? <Pause size={24} fill='#fff' /> : <Play size={24} fill='#fff' />}
-                {isMuted ? <VolumeOff size={24} fill='#fff' /> : volume >= 0.5 ? <Volume2 size={24} fill='#fff' /> : <Volume1 size={24} fill='#fff' />}
+                {isPlaying ? <Pause className='cursor-pointer' size={24} fill='#fff' onClick={togglePlay} />
+                : <Play className='cursor-pointer' size={24} fill='#fff' onClick={togglePlay} />}
+                {isMuted ? <VolumeOff className='cursor-pointer' size={24} fill='#fff' onClick={toggleMute} />
+                : volume >= 0.5 ? <Volume2 className='cursor-pointer' size={24} fill='#fff' onClick={toggleMute} />
+                : <Volume1 className='cursor-pointer' size={24} fill='#fff' onClick={toggleMute} />}
             </div>
         </div>
     </div>
