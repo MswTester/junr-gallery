@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const ContentOption = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -57,20 +58,20 @@ export default function Upload() {
       </CardHeader>
       <CardContent className="flex flex-col justify-center items-center gap-4 p-4">
         <ContentOption>
-          <Label htmlFor="title">제목</Label>
-          <Input id="title" value={title} onChange={e => setTitle(e.target.value)} />
+          <Label className="w-16 text-right" htmlFor="title">제목</Label>
+          <Input id="title" value={title} onChange={e => setTitle(e.target.value)} placeholder="제목을 입력해주세요" />
         </ContentOption>
         <ContentOption>
-          <Label htmlFor="description">설명</Label>
-          <Input id="description" value={description} onChange={e => setDescription(e.target.value)} />
+          <Label className="w-16 text-right" htmlFor="description">설명</Label>
+          <Input id="description" value={description} onChange={e => setDescription(e.target.value)} placeholder="설명을 입력해주세요" />
         </ContentOption>
         <ContentOption>
-          <Label htmlFor="artist">작업자</Label>
-          <Input id="artist" value={artist} onChange={e => setArtist(e.target.value)} />
+          <Label className="w-16 text-right" htmlFor="artist">작업자</Label>
+          <Input id="artist" value={artist} onChange={e => setArtist(e.target.value)} placeholder="작업자를 입력해주세요" />
         </ContentOption>
         <ContentOption>
-          <Label htmlFor="file">파일</Label>
-          <Input id="file" type="file" onChange={handleFileChange} />
+          <Label className="w-16 text-right" htmlFor="file">파일</Label>
+          <Input id="file" type="file" onChange={handleFileChange} accept="video/mp4" multiple={false} />
         </ContentOption>
       </CardContent>
       <CardFooter>

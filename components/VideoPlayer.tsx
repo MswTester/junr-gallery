@@ -8,7 +8,7 @@ interface VideoPlayerProps extends HTMLAttributes<HTMLDivElement> {
     height?: number;
 }
 
-const VideoPlayer = ({src, className, width, height}:VideoPlayerProps) => {
+const VideoPlayer = ({src, className, width:w, height:h}:VideoPlayerProps) => {
     const [once, setOnce] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
     const [isPlaying, setIsPlaying] = useState(true);
@@ -16,6 +16,9 @@ const VideoPlayer = ({src, className, width, height}:VideoPlayerProps) => {
     const [volume, setVolume] = useState(1);
     const [isMuted, setIsMuted] = useState(false);
     const [time, setTime] = useState(0);
+
+    const width = w || 640;
+    const height = h || 360;
 
     useEffect(() => setOnce(true), []);
 
@@ -75,8 +78,8 @@ const VideoPlayer = ({src, className, width, height}:VideoPlayerProps) => {
         }
     }
 
-    return once && <div className={"relative flex flex-col items-center rounded-md bg-[#000] -z-20 " + className} style={{width: `${width || 1200}px`, height: `${height || 900}px`}} onClick={togglePlay}>
-        <video src={src} className='absolute top-0 left-0 -z-10 w-full h-full' autoPlay={true} muted={isMuted} onTimeUpdate={onTimeUpdate} />
+    return once && <div className={"relative flex flex-col items-center rounded-md bg-[#000] -z-20 " + className} style={{width: `${width}px`, height: `${height}px`}} onClick={togglePlay}>
+        <video src={src} className='absolute top-0 left-0 -z-10' autoPlay={true} muted={isMuted} onTimeUpdate={onTimeUpdate} width={width} height={height} />
         <div></div>
     </div>
 }
