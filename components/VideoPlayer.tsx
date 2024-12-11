@@ -78,9 +78,8 @@ const VideoPlayer = ({src, className, width:w, height:h}:VideoPlayerProps) => {
         }
     }
 
-    return once && <div className={"relative flex flex-col items-center rounded-md bg-[#000] -z-20 " + className} style={{width: `${width}px`, height: `${height}px`}} onClick={togglePlay}>
-        <video src={src} className='absolute top-0 left-0 -z-10' autoPlay={true} muted={isMuted} onTimeUpdate={onTimeUpdate} width={width} height={height} />
-        <div></div>
+    return once && <div className={"relative flex flex-col items-center bg-[#000] -z-20 " + className} style={{width: `${width}px`, height: `${height}px`, borderRadius: "10px"}} onClick={togglePlay}>
+        <video src={src} className='absolute top-0 left-0 -z-10 w-full h-full' autoPlay={true} muted={isMuted} onTimeUpdate={onTimeUpdate} />
     </div>
 }
 

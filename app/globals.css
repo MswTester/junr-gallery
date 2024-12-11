@@ -14,6 +14,17 @@ html, body{
   overflow: hidden;
 }
 
+@font-face {
+	font-family: 'SUIT-Medium';
+	font-weight: 500;
+	src: local('SUIT Medium'), url('/app/fonts/SUIT-ttf/SUIT-Medium.ttf') format('truetype');
+}
+@font-face {
+	font-family: 'SUIT-Bold';
+	font-weight: 700;
+	src: local('SUIT Bold'), url('/app/fonts/SUIT-ttf/SUIT-Bold.ttf') format('truetype');
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

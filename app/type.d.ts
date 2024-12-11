@@ -11,5 +11,6 @@ interface VideoDisplay{
     title: string;
     artist: string;
     description: string;
-    url: string;
+    videoUrl: string;
+    qrUrl: string;
 }
