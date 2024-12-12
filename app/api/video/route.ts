@@ -57,7 +57,7 @@ export const POST = async (req: NextRequest) => {
       title,
       description,
       artist,
-      url: `/api/stream?id=${id}`,
+      url: `/videos/${id}.mp4`,
     });
     await fsPromises.writeFile(dbPath, JSON.stringify(db, null, 2));
 

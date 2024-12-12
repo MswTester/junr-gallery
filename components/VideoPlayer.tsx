@@ -2,7 +2,7 @@
 
 import React, { createContext, HTMLAttributes, useContext, useEffect, useRef, useState } from 'react';
 import { Progress } from './ui/progress';
-import { ChevronsLeft, ChevronsRight, Pause, Play, Volume1, Volume2, VolumeOff } from 'lucide-react';
+import { ChevronsLeft, ChevronsRight, Fullscreen, Pause, Play, Volume1, Volume2, VolumeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface VideoPlayerProps extends HTMLAttributes<HTMLDivElement> {
@@ -11,6 +11,7 @@ interface VideoPlayerProps extends HTMLAttributes<HTMLDivElement> {
     height?: number;
     borderRadius?: number;
     onEnd?: () => void;
+    useMobile?: boolean;
 }
 
 interface VideoContextProps {
@@ -29,18 +30,15 @@ interface VideoContextProps {
 
 const VideoContext = createContext<VideoContextProps|null>(null);
 
-const VideoPlayer = ({src, className, width:w, height:h, borderRadius = 10, onEnd}:VideoPlayerProps) => {
+const VideoPlayer = ({src, className, width, height, borderRadius = 10, onEnd, useMobile = false}:VideoPlayerProps) => {
     const [once, setOnce] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
-    const [isPlaying, setIsPlaying] = useState(true);
+    const [isPlaying, setIsPlaying] = useState(false);
     const [speedRate, setSpeedRate] = useState(1);
     const [volume, setVolume] = useState(.5);
     const [isMuted, setIsMuted] = useState(false);
     const [time, setTime] = useState(0);
     const [duration, setDuration] = useState(0);
-
-    const width = w || 640;
-    const height = h || 360;
 
     useEffect(() => setOnce(true), []);
 
@@ -91,9 +89,20 @@ const VideoPlayer = ({src, className, width:w, height:h, borderRadius = 10, onEn
         }
     }
 
-    return once && <div className={"relative flex flex-col items-center bg-[#000] " + className} style={{width: `${width}px`, height: `${height}px`, borderRadius: `${borderRadius}px`}}>
+    useEffect(() => {
+        setIsPlaying(true)
+    }, [src])
+
+    return once && <div className={"relative flex flex-col items-center bg-[#000] " + className}
+        style={{
+            width: width ? `${width}px` : '100%',
+            height: height ? `${height}px` : '100%',
+            borderRadius: `${borderRadius}px`
+        }}
+    >
         <video src={src} ref={videoRef} className='w-full h-full' autoPlay={true} muted={isMuted} onTimeUpdate={onTimeUpdate} onEnded={onEnd} onLoadedMetadata={e => {
             if(videoRef.current) {
+                setIsPlaying(true)
                 setDuration(videoRef.current.duration);
             }
         }}>
@@ -101,12 +110,12 @@ const VideoPlayer = ({src, className, width:w, height:h, borderRadius = 10, onEn
             Your browser does not support the video tag.
         </video>
         <VideoContext.Provider value={{togglePlay, setSpeed, setVolume, toggleMute, seek, isPlaying, speedRate, volume, isMuted, time, duration}}>
-            <Controller />
+            <Controller useMobile={useMobile} video={videoRef.current} />
         </VideoContext.Provider>
     </div>
 }
 
-const Controller = () => {
+const Controller = (props: {useMobile?: boolean; video: HTMLVideoElement | null}) => {
     const context = useContext(VideoContext);
     if (!context) {
         return null; // or handle the null case appropriately
@@ -149,6 +158,9 @@ const Controller = () => {
                 <ChevronsLeft className='cursor-pointer' size={24} onClick={() => setSpeed(Math.max(0.25, speedRate - 0.25))} />
                 <div className='text-white select-none text-center w-8'>{speedRate}x</div>
                 <ChevronsRight className='cursor-pointer' size={24} onClick={() => setSpeed(Math.min(2, speedRate + 0.25))} />
+                {props.useMobile && <Fullscreen size={24} className='cursor-pointer' onClick={e => {
+                    if(props.video) props.video.requestFullscreen()
+                }} />}
             </div>
         </div>
     </motion.div>

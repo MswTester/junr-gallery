@@ -1,6 +1,8 @@
+import { Column, ImageView, Row, Spacing, TextView } from "@/components/primitives";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command";
 import { Separator } from "@/components/ui/separator";
 import VideoPlayer from "@/components/VideoPlayer";
+import { generateQrCodeBlobUrl } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, User, Users, Users2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
@@ -27,43 +29,6 @@ const Overlay = styled.div<{ $isSearching: boolean }>`
     background-color: ${({ $isSearching }) => $isSearching ? 'rgba(0, 0, 0, 0.5)' : 'transparent'};
 `;
 
-const Row = styled.div<{ $width?: string, $height?: string }>`
-    width: ${({ $width = 'auto' }) => $width};
-    height: ${({ $height = 'auto' }) => $height};
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-`;
-const Column = styled.div<{ $width?: string, $height?: string }>`
-    width: ${({ $width = 'auto' }) => $width};
-    height: ${({ $height = 'auto' }) => $height};
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-`;
-const Spacing = styled.div<{ $horizontal?: string, $vertical?: string }>`
-    width: ${({ $horizontal = '0px' }) => $horizontal};
-    height: ${({ $vertical = '0px' }) => $vertical};
-`;
-
-const TextView = styled.div<{ $font: string, $size: string, $width?: string }>`
-    width: ${({ $width = 'auto' }) => $width};
-    font-family: ${({ $font }) => $font};
-    font-size: ${({ $size }) => $size};
-    line-height: 1;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-`;
-const ImageView = styled.img<{ $src: string, $size: string }>`
-    content: url(${({ $src }) => $src});
-    object-fit: cover;
-    width: ${({ $size }) => $size};
-    height: ${({ $size }) => $size};
-    border: 1px #999 solid;
-    border-radius: 10px;
-`;
-
 const SearchContainer = styled.div`
     position: absolute;
     top: 50%;
@@ -77,26 +42,35 @@ const SearchContainer = styled.div`
     overflow: 'hidden';
 `;
 
-const DesktopScreen = () => {
+const DesktopScreen = (props: {inputId?: string}) => {
     const [videos, setVideos] = useState<VideoData[]>([
         {
             "id": "0",
             "title": "",
             "description": "",
             "artist": "",
-            "url": ""
+            "url": "/"
         }
     ]);
     const [playingIdx, setPlayingIdx] = useState(0);
     const [isSearching, setIsSearching] = useState(false);
+    const [qrUrl, setQrUrl] = useState('');
+
+    const prevIdx = () => setPlayingIdx((prev) => (prev > 0 ? prev - 1 : videos.length - 1))
+    const nextIdx = () => setPlayingIdx((prev) => (prev < videos.length - 1 ? prev + 1 : 0))
 
     const handleKeyPress = (event: KeyboardEvent) => {
         const ctrlPressed = event.ctrlKey;
-        const keyPressed = event.key === 'f';
+        const keyFPressed = event.key === 'f';
+        const keyESCPressed = event.key === 'Escape';
 
-        if (ctrlPressed && keyPressed) {
+        if (ctrlPressed && keyFPressed) {
             event.preventDefault();
             setIsSearching((prev) => !prev);
+        }
+        if (keyESCPressed) {
+            event.preventDefault();
+            setIsSearching(false);
         }
     }
 
@@ -114,39 +88,51 @@ const DesktopScreen = () => {
         };
     }, []);
 
+    useEffect(() => {
+        if (props.inputId) {
+            const findIndex = videos.findIndex(video => video.id === props.inputId);
+            if (findIndex !== -1) {
+                setPlayingIdx(findIndex);
+            }
+        }
+    }, [props.inputId])
+
+    useEffect(() => {
+        generateQrCodeBlobUrl(`/mobile/${videos[playingIdx].id}`)
+        .then(it => setQrUrl(it));
+    }, [videos, playingIdx])
+
     return (
         <ScreenContainer>
-            { isSearching && (
-                <>
-                    <Overlay $isSearching={isSearching} />
-                    <SearchContainer>
-                        <Command>
-                            <CommandInput placeholder="Type a command or search..." />
-                            <CommandList>
-                                <CommandEmpty>No results found.</CommandEmpty>
-                                {
-                                    videos.slice(0, 10).map((video, i) => {
-                                        return <CommandItem>
-                                            <TextView $font="SUIT-Medium" $size="16px" $width="100px">{video.artist}</TextView>
-                                            <Separator orientation="vertical" className="h-4" />
-                                            <TextView $font="SUIT-Medium" $size="16px">{video.title}</TextView>
-                                        </CommandItem>
-                                    })
-                                }
-                            </CommandList>
-                        </Command>
-                    </SearchContainer>
-                </>
-            )}
+            { isSearching && <>
+                <Overlay $isSearching={isSearching} onClick={() => setIsSearching(false)} />
+                <SearchContainer>
+                    <Command>
+                        <CommandInput placeholder="Type a command or search..." />
+                        <CommandList>
+                            <CommandEmpty>No results found.</CommandEmpty>
+                            {
+                                videos.slice(0, 10).map((video, i) => {
+                                    return <CommandItem>
+                                        <TextView $font="SUIT-Medium" $size="16px" $width="100px">{video.artist}</TextView>
+                                        <Separator orientation="vertical" className="h-4" />
+                                        <TextView $font="SUIT-Medium" $size="16px">{video.title}</TextView>
+                                    </CommandItem>
+                                })
+                            }
+                        </CommandList>
+                    </Command>
+                </SearchContainer>
+            </>}
             <ChevronLeft
                 size={36}
-                onClick={() => setPlayingIdx((prev) => (prev > 0 ? prev - 1 : videos.length - 1))}
+                onClick={prevIdx}
             />
             <Column>
-                <VideoPlayer src={videos[playingIdx].url} width={700} height={360} />
+                <VideoPlayer src={videos[playingIdx].url} width={900} height={500} onEnd={nextIdx} />
                 <Spacing $vertical="28px" />
                 <Row>
-                    <Column $width="580px">
+                    <Column $width="780px">
                         <TextView $font="SUIT-Bold" $size="28px">{videos[playingIdx].title}</TextView>
                         <Spacing $vertical="10px" />
                         <TextView $font="SUIT-Medium" $size="20px">{videos[playingIdx].description}</TextView>
@@ -157,12 +143,12 @@ const DesktopScreen = () => {
                             <TextView $font="SUIT-Medium" $size="18px">{videos[playingIdx].artist}</TextView>
                         </Row>
                     </Column>
-                    <ImageView $src={videos[playingIdx].url} $size="120px" />
+                    <ImageView $src={qrUrl} $size="120px" />
                 </Row>
             </Column>
             <ChevronRight
                 size={36}
-                onClick={() => setPlayingIdx((prev) => (prev < videos.length - 1 ? prev + 1 : 0))}
+                onClick={nextIdx}
             />
         </ScreenContainer>
     );

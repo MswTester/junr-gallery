@@ -8,8 +8,9 @@ export function cn(...inputs: ClassValue[]) {
 
 export async function generateQrCodeBlobUrl(text: string): Promise<string> {
   try {
+    const hostname = "http://192.168.0.33:3000";
     // Generate QR code as a data URL (base64 encoded image)
-    const dataUrl = await QRCode.toDataURL(text);
+    const dataUrl = await QRCode.toDataURL(`${hostname}${text}`);
 
     // Convert the data URL to a Blob
     const blob = await fetch(dataUrl).then((res) => res.blob());
