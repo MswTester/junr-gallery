@@ -147,7 +147,7 @@ const Controller = () => {
             </div>
             <div className='flex gap-2'>
                 <ChevronsLeft className='cursor-pointer' size={24} onClick={() => setSpeed(Math.max(0.25, speedRate - 0.25))} />
-                <span className='text-white select-none'>{speedRate}x</span>
+                <div className='text-white select-none text-center w-8'>{speedRate}x</div>
                 <ChevronsRight className='cursor-pointer' size={24} onClick={() => setSpeed(Math.min(2, speedRate + 0.25))} />
             </div>
         </div>
