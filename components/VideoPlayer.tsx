@@ -102,7 +102,7 @@ const VideoPlayer = ({src, className, width:w, height:h, borderRadius = 10, onEn
     }
 
     return once && <div className={"relative flex flex-col items-center bg-[#000] " + className} style={{width: `${width}px`, height: `${height}px`, borderRadius: `${borderRadius}px`}}>
-        <video ref={videoRef} className='w-full h-full' autoPlay={true} muted={isMuted} onTimeUpdate={onTimeUpdate} onEnded={onEnd} onLoadedMetadata={e => {
+        <video src={src} ref={videoRef} className='w-full h-full' autoPlay={true} muted={isMuted} onTimeUpdate={onTimeUpdate} onEnded={onEnd} onLoadedMetadata={e => {
             if(videoRef.current) {
                 setDuration(videoRef.current.duration);
             }

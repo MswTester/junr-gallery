@@ -46,10 +46,14 @@ const Spacing = styled.div<{ $horizontal?: string, $vertical?: string }>`
     height: ${({ $vertical = '0px' }) => $vertical};
 `;
 
-const TextView = styled.div<{ $font: string, $size: string }>`
+const TextView = styled.div<{ $font: string, $size: string, $width?: string }>`
+    width: ${({ $width = 'auto' }) => $width};
     font-family: ${({ $font }) => $font};
     font-size: ${({ $size }) => $size};
     line-height: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 `;
 const ImageView = styled.img<{ $src: string, $size: string }>`
     content: url(${({ $src }) => $src});
@@ -65,9 +69,7 @@ const SearchContainer = styled.div`
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 50%;
-    min-width: 400px;
-    max-width: 600px;
+    width: 600px;
     z-index: 2;
     background-color: white;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
@@ -124,9 +126,10 @@ const DesktopScreen = () => {
                                 <CommandEmpty>No results found.</CommandEmpty>
                                 {
                                     videos.slice(0, 10).map((video, i) => {
-                                        return <CommandItem className="flex gap-2">
-                                            <div className="w-16 overflow-hidden text-nowrap text-ellipsis">{video.artist}</div>
-                                            <Separator orientation="vertical" className="h-4" />{video.title}
+                                        return <CommandItem>
+                                            <TextView $font="SUIT-Medium" $size="16px" $width="100px">{video.artist}</TextView>
+                                            <Separator orientation="vertical" className="h-4" />
+                                            <TextView $font="SUIT-Medium" $size="16px">{video.title}</TextView>
                                         </CommandItem>
                                     })
                                 }
@@ -143,7 +146,7 @@ const DesktopScreen = () => {
                 <VideoPlayer src={videos[playingIdx].url} width={700} height={360} />
                 <Spacing $vertical="28px" />
                 <Row>
-                    <Column $width="100%">
+                    <Column $width="580px">
                         <TextView $font="SUIT-Bold" $size="28px">{videos[playingIdx].title}</TextView>
                         <Spacing $vertical="10px" />
                         <TextView $font="SUIT-Medium" $size="20px">{videos[playingIdx].description}</TextView>
