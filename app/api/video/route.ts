@@ -1,7 +1,6 @@
 import { createWriteStream, readFileSync, promises as fsPromises } from "fs";
 import { NextRequest, NextResponse } from "next/server";
 import { pipeline, Readable } from "stream";
-import busboy from "busboy";
 import { promisify } from "util";
 
 const pipelineAsync = promisify(pipeline);
