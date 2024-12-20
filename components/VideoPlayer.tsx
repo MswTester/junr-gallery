@@ -93,14 +93,15 @@ const VideoPlayer = ({src, className, width, height, borderRadius = 10, onEnd, u
         setIsPlaying(true)
     }, [src])
 
-    return once && <div className={"relative flex flex-col items-center bg-[#000] " + className}
+    if (!once) return null;
+
+    return <div className={"relative flex flex-col items-center bg-[#000] " + className}
         style={{
             width: width ? `${width}px` : '100%',
             height: height ? `${height}px` : '100%',
             borderRadius: `${borderRadius}px`
-        }}
-    >
-        <video src={src} ref={videoRef} className='w-full h-full' autoPlay={true} muted={isMuted} onTimeUpdate={onTimeUpdate} onEnded={onEnd} onLoadedMetadata={e => {
+        }}>
+        <video src={src} ref={videoRef} className='w-full h-full' autoPlay={true} muted={isMuted} onTimeUpdate={onTimeUpdate} onEnded={onEnd} onLoadedMetadata={() => {
             if(videoRef.current) {
                 setIsPlaying(true)
                 setDuration(videoRef.current.duration);
@@ -131,15 +132,14 @@ const Controller = (props: {useMobile?: boolean; video: HTMLVideoElement | null}
     }, [show]);
 
     return <motion.div className="absolute top-0 left-0 w-full h-full p-2 gap-2 flex flex-col justify-end items-center tet-el" onPointerDown={e => {
-        e.stopPropagation();
-        if(e.target === e.currentTarget) togglePlay();
+            e.stopPropagation();
+            if(e.target === e.currentTarget) togglePlay();
     }}
-    onPointerMove={() => setShow(true)}
-    onPointerEnter={() => setShow(true)}
-    initial={{opacity: 0, y: 20}}
-    animate={{opacity: show ? 1 : 0, y: show ? 0 : 20}}
+        onPointerEnter={() => setShow(true)}
+        initial={{opacity: 0, y: 20}}
+        animate={{opacity: show ? 1 : 0, y: show ? 0 : 20}}
     >
-        <Progress value={time/duration*100} max={100} className="w-full cursor-pointer" onClick={e => {
+        <Progress value={time/duration*100} max={100} className="w-full cursor-pointer" onClick={(e: React.MouseEvent<HTMLDivElement>) => {
             const rect = e.currentTarget.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const percent = x / rect.width;
@@ -155,10 +155,8 @@ const Controller = (props: {useMobile?: boolean; video: HTMLVideoElement | null}
                 : <Volume1 className='cursor-pointer' size={24} fill='#fff' onClick={toggleMute} />}
             </div>
             <div className='flex gap-2'>
-                <ChevronsLeft className='cursor-pointer' size={24} onClick={() => setSpeed(Math.max(0.25, speedRate - 0.25))} />
-                <div className='text-white select-none text-center w-8'>{speedRate}x</div>
                 <ChevronsRight className='cursor-pointer' size={24} onClick={() => setSpeed(Math.min(2, speedRate + 0.25))} />
-                {props.useMobile && <Fullscreen size={24} className='cursor-pointer' onClick={e => {
+                {props.useMobile && <Fullscreen size={24} className='cursor-pointer' onClick={() => {
                     if(props.video) props.video.requestFullscreen()
                 }} />}
             </div>
