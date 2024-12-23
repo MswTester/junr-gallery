@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export async function generateQrCodeBlobUrl(text: string): Promise<string> {
   try {
-    const hostname = "http://192.168.0.33:3000";
+    const hostname = process.env.NODE_ENV === "production" ? "https://junr-gallery.vercel.app" : "http://localhost:3000";
     // Generate QR code as a data URL (base64 encoded image)
     const dataUrl = await QRCode.toDataURL(`${hostname}${text}`);
 
