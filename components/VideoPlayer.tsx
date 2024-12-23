@@ -26,6 +26,8 @@ interface VideoContextProps {
     isMuted: boolean;
     time: number;
     duration: number;
+    show: boolean;
+    setShow: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const VideoContext = createContext<VideoContextProps|null>(null);
@@ -39,6 +41,7 @@ const VideoPlayer = ({src, className, width, height, borderRadius = 10, onEnd, u
     const [isMuted, setIsMuted] = useState(false);
     const [time, setTime] = useState(0);
     const [duration, setDuration] = useState(0);
+    const [show, setShow] = useState(false);
 
     useEffect(() => setOnce(true), []);
 
@@ -57,6 +60,13 @@ const VideoPlayer = ({src, className, width, height, borderRadius = 10, onEnd, u
             videoRef.current.volume = volume;
         }
     }, [volume]);
+
+    useEffect(() => {
+        if(show){
+            const timer = setTimeout(() => setShow(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [show]);
 
     const togglePlay = () => {
         setIsPlaying(!isPlaying);
@@ -110,7 +120,7 @@ const VideoPlayer = ({src, className, width, height, borderRadius = 10, onEnd, u
             <source src={src} type="video/mp4" />
             Your browser does not support the video tag.
         </video>
-        <VideoContext.Provider value={{togglePlay, setSpeed, setVolume, toggleMute, seek, isPlaying, speedRate, volume, isMuted, time, duration}}>
+        <VideoContext.Provider value={{togglePlay, setSpeed, setVolume, toggleMute, seek, isPlaying, speedRate, volume, isMuted, time, duration, show, setShow}}>
             <Controller useMobile={useMobile} video={videoRef.current} />
         </VideoContext.Provider>
     </div>
@@ -121,15 +131,7 @@ const Controller:React.FC<{useMobile?: boolean; video: HTMLVideoElement | null}>
     if (!context) {
         return null; // or handle the null case appropriately
     }
-    const {isPlaying, isMuted, volume, togglePlay, time, duration, toggleMute, seek, setSpeed, speedRate} = context;
-    const [show, setShow] = useState(false);
-
-    useEffect(() => {
-        if(show){
-            const timer = setTimeout(() => setShow(false), 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [show]);
+    const {isPlaying, isMuted, volume, togglePlay, time, duration, toggleMute, seek, setSpeed, speedRate, show, setShow} = context;
 
     return <motion.div className="absolute top-0 left-0 w-full h-full p-2 gap-2 flex flex-col justify-end items-center tet-el" onPointerDown={e => {
             e.stopPropagation();
