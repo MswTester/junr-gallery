@@ -45,7 +45,8 @@ export const POST = async (req: NextRequest) => {
     console.log(req.body)
     // Save the video file
     const writeStream = createWriteStream(filePath);
-    await pipelineAsync(req.body as any, writeStream);
+    const readable = Readable.fromWeb(req.body as any);
+    await pipelineAsync(readable, writeStream);
 
     console.log(`File saved successfully: ${filePath}`);
 

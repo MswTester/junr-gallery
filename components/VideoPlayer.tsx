@@ -116,7 +116,7 @@ const VideoPlayer = ({src, className, width, height, borderRadius = 10, onEnd, u
     </div>
 }
 
-const Controller = (props: {useMobile?: boolean; video: HTMLVideoElement | null}) => {
+const Controller:React.FC<{useMobile?: boolean; video: HTMLVideoElement | null}> = (props) => {
     const context = useContext(VideoContext);
     if (!context) {
         return null; // or handle the null case appropriately
