@@ -112,11 +112,14 @@ const DesktopScreen = (props: {inputId?: string}) => {
                         <CommandList>
                             <CommandEmpty>No results found.</CommandEmpty>
                             {
-                                videos.slice(0, 10).map((video, i) => {
-                                    return <CommandItem>
+                                videos.map((video, i) => {
+                                    return <CommandItem key={i}>
                                         <TextView $font="SUIT-Medium" $size="16px" $width="100px">{video.artist}</TextView>
                                         <Separator orientation="vertical" className="h-4" />
-                                        <TextView $font="SUIT-Medium" $size="16px">{video.title}</TextView>
+                                        <TextView $font="SUIT-Medium" $size="16px" style={{cursor:"pointer"}} onClick={() => {
+                                            setPlayingIdx(i);
+                                            setIsSearching(false);
+                                        }}>{video.title}</TextView>
                                     </CommandItem>
                                 })
                             }
@@ -129,10 +132,12 @@ const DesktopScreen = (props: {inputId?: string}) => {
                 onClick={prevIdx}
             />
             <Column>
-                <VideoPlayer src={videos[playingIdx].url} width={900} height={500} onEnd={nextIdx} />
+                <TextView $font="SUIT-Medium" $size="18px" $textAlign="center" $width="100%">Ctrl + F로 작품 목록을 확인할 수 있습니다.</TextView>
+                <Spacing $vertical="14px" />
+                <VideoPlayer src={videos[playingIdx].url} width={1300} height={800} onEnd={nextIdx} />
                 <Spacing $vertical="28px" />
                 <Row>
-                    <Column $width="780px">
+                    <Column $width="1180px">
                         <TextView $font="SUIT-Bold" $size="28px">{videos[playingIdx].title}</TextView>
                         <Spacing $vertical="10px" />
                         <TextView $font="SUIT-Medium" $size="20px">{videos[playingIdx].description}</TextView>
